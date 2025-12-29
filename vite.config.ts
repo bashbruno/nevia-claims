@@ -1,22 +1,13 @@
-import { defineConfig } from "vite"
-import { tanstackStart } from "@tanstack/react-start/plugin/vite"
-import viteReact from "@vitejs/plugin-react"
-import viteTsConfigPaths from "vite-tsconfig-paths"
-import tailwindcss from "@tailwindcss/vite"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-const config = defineConfig({
+// https://vite.dev/config/
+export default defineConfig({
   plugins: [
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ["./tsconfig.json"]
+    react({
+      babel: {
+        plugins: [['babel-plugin-react-compiler']],
+      },
     }),
-    tailwindcss(),
-    tanstackStart({
-      customViteReactPlugin: true,
-      target: "vercel"
-    }),
-    viteReact()
-  ]
+  ],
 })
-
-export default config
