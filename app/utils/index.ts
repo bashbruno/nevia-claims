@@ -1,3 +1,6 @@
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
 export const time = Object.freeze({
   millisecond: 1,
   get second() {
@@ -13,3 +16,7 @@ export const time = Object.freeze({
     return this.hour * 24
   },
 })
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
