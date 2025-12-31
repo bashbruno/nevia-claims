@@ -39,7 +39,7 @@ export function Header() {
         value={search}
         onChange={(e) => handleSearchChange(e.target.value)}
       />
-      <label className="flex items-center gap-2 cursor-pointer">
+      <label className="inline-flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
           className="toggle toggle-primary"

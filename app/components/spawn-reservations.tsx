@@ -84,8 +84,14 @@ type AreaAccordionProps = {
 }
 
 function AreaAccordion({ area, filteredSpawns }: AreaAccordionProps) {
+  const search = useFilterSearch()
+  const hasActiveSearch = !!search.trim()
+
   return (
-    <Accordion.Container name={`accordion-area-${area.id}`}>
+    <Accordion.Container
+      name={`accordion-area-${area.id}`}
+      forceOpen={hasActiveSearch}
+    >
       <Accordion.Title>{area.name}</Accordion.Title>
       <Accordion.Content className="space-y-3">
         {filteredSpawns.map((spawn) => (
@@ -105,15 +111,20 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
   const { toggleFavoritedSpawn } = useAppStoreActions()
   const reservations = useReservations()
   const favoritedSpawns = useFavoritedSpawns()
+  const search = useFilterSearch()
   const areaReservartions = reservations.data?.find((r) => r.id === areaId)
   const spawnReservations = areaReservartions?.respawnReservations.find(
     (r) => r.name === spawn,
   )
 
   const isEmpty = !spawnReservations?.reservations.length
+  const hasActiveSearch = !!search.trim()
 
   return (
-    <Accordion.Container name={`accordion-respawn-${spawn}`}>
+    <Accordion.Container
+      name={`accordion-respawn-${spawn}`}
+      forceOpen={hasActiveSearch}
+    >
       <Accordion.Title className="flex items-center gap-2">
         <button
           type="button"

@@ -8,20 +8,31 @@ export const Accordion = {
   Content,
 }
 
-function Container(props: ComponentProps<'details'>) {
+type ContainerProps = ComponentProps<'details'> & {
+  forceOpen?: boolean
+}
+
+function Container({ forceOpen, ...props }: ContainerProps) {
   const name = props.name
   if (!name) throw new Error('Accordion must have a name')
-  const open = useIsAccordionOpen(name)
+  const persistedOpen = useIsAccordionOpen(name)
   const { toggleAccordion } = useAppStoreActions()
+
+  // If forceOpen is true, accordion is open (transient, not persisted)
+  // Otherwise, use the persisted state
+  const open = forceOpen || persistedOpen
 
   return (
     <details
       {...props}
       open={open}
       onToggle={(e) => {
+        // Don't persist state changes when forceOpen is active
+        if (forceOpen) return
+
         // Only toggle if the DOM state actually changed (user interaction)
         const newOpenState = e.currentTarget.open
-        if (newOpenState !== open) {
+        if (newOpenState !== persistedOpen) {
           toggleAccordion(name)
         }
       }}
