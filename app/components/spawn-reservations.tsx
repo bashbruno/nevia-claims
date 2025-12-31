@@ -1,7 +1,11 @@
-import { Star } from 'lucide-react'
+import { Hand, Star } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { Accordion } from '~/components/accordion'
+import {
+  CLAIM_SPAWN_MODAL_ID,
+  ClaimSpawnModal,
+} from '~/components/claim-spawn-modal'
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import { ReservationDisplay } from '~/components/reservation-display'
 import { useAreas } from '~/hooks/use-areas'
@@ -79,6 +83,7 @@ export function SpawnReservations() {
           </div>
         )}
       />
+      <ClaimSpawnModal />
     </div>
   )
 }
@@ -90,14 +95,17 @@ type AreaAccordionProps = {
 
 function AreaAccordion({ area, filteredSpawns }: AreaAccordionProps) {
   const search = useFilterSearch()
-  const hasActiveSearch = !!search.trim()
+  const selectedAreas = useSelectedAreas()
+  const hasActiveSearch = !!search.trim() || selectedAreas.size > 0
 
   return (
     <Accordion.Container
       name={`accordion-area-${area.id}`}
       forceOpen={hasActiveSearch}
     >
-      <Accordion.Title>{area.name}</Accordion.Title>
+      <Accordion.Title>
+        <span className="hover:underline underline-offset-2">{area.name}</span>
+      </Accordion.Title>
       <Accordion.Content className="space-y-3">
         {filteredSpawns.map((spawn) => (
           <SpawnAccordion key={spawn} spawn={spawn} areaId={area.id} />
@@ -117,13 +125,14 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
   const reservations = useReservations()
   const favoritedSpawns = useFavoritedSpawns()
   const search = useFilterSearch()
+  const selectedAreas = useSelectedAreas()
   const areaReservartions = reservations.data?.find((r) => r.id === areaId)
   const spawnReservations = areaReservartions?.respawnReservations.find(
     (r) => r.name === spawn,
   )
 
   const isEmpty = !spawnReservations?.reservations.length
-  const hasActiveSearch = !!search.trim()
+  const hasActiveSearch = !!search.trim() || selectedAreas.size > 0
 
   return (
     <Accordion.Container
@@ -144,7 +153,20 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
             fill={favoritedSpawns.has(spawn) ? 'yellow' : 'transparent'}
           />
         </button>
-        <HighlitableBySearch text={spawn} />
+        <button
+          type="button"
+          className="btn btn-square bg-transparent border-none hover:bg-neutral"
+          onClick={(e) => {
+            e.stopPropagation()
+            // @ts-expect-error daisyUI component
+            document.getElementById(CLAIM_SPAWN_MODAL_ID)?.showModal()
+          }}
+        >
+          <Hand size={18} />
+        </button>
+        <span className="hover:underline underline-offset-2">
+          <HighlitableBySearch text={spawn} />
+        </span>
       </Accordion.Title>
       <Accordion.Content className="space-y-3">
         {isEmpty && (

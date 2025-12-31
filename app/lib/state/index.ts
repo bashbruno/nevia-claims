@@ -21,6 +21,7 @@ type State = {
   showOnlyFavorited: boolean
   openAccordions: Set<string>
   hasHydrated: boolean
+  characterName: string
 }
 
 type Actions = {
@@ -30,6 +31,7 @@ type Actions = {
   toggleFavoritedSpawn: (spawnName: string) => void
   toggleShowOnlyFavorited: () => void
   toggleAccordion: (accordionName: string) => void
+  setCharacterName: (name: string) => void
 }
 
 export function useSelectedAreas() {
@@ -38,6 +40,10 @@ export function useSelectedAreas() {
 
 export function useFilterSearch() {
   return useAppStore((s) => s.state.filterSearch)
+}
+
+export function useCharacterName() {
+  return useAppStore((s) => s.state.characterName)
 }
 
 export function useFavoritedSpawns() {
@@ -71,6 +77,7 @@ const useAppStore = create<AppStore>()(
         showOnlyFavorited: false,
         openAccordions: new Set(),
         hasHydrated: false,
+        characterName: '',
       },
       actions: {
         toggleSelectedArea: (areaId) => {
@@ -113,6 +120,11 @@ const useAppStore = create<AppStore>()(
             } else {
               s.state.openAccordions.add(accordionName)
             }
+          })
+        },
+        setCharacterName: (name) => {
+          set((s) => {
+            s.state.characterName = name
           })
         },
       },
