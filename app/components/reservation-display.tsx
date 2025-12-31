@@ -1,6 +1,5 @@
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import type { Reservation } from '~/lib/api/types'
-import { useFilterSearch } from '~/lib/state'
 import { cn, formatDate, formatTime, getIsAdvanceClaim } from '~/utils'
 
 type Props = {
@@ -8,7 +7,6 @@ type Props = {
 }
 
 export function ReservationDisplay({ reservation }: Props) {
-  const search = useFilterSearch()
   const isAdvanceClaim = getIsAdvanceClaim(reservation.startDate)
   const startTime = formatTime(reservation.startDate)
   const endTime = formatTime(reservation.endDate)
@@ -32,10 +30,7 @@ export function ReservationDisplay({ reservation }: Props) {
       <p className="font-semibold flex flex-col items-center text-base">
         {isAdvanceClaim && <span className="text-xs">(In Advance)</span>}
         <span>
-          <HighlitableBySearch
-            text={reservation.characterName}
-            search={search}
-          />
+          <HighlitableBySearch text={reservation.characterName} />
         </span>
       </p>
       <div />

@@ -1,12 +1,12 @@
+import { useFilterSearch } from '~/lib/state'
+
 type HighlitableBySearchProps = {
   text: string
-  search: string
 }
 
-export function HighlitableBySearch({
-  text,
-  search,
-}: HighlitableBySearchProps) {
+export function HighlitableBySearch({ text }: HighlitableBySearchProps) {
+  const search = useFilterSearch()
+
   if (!search.trim()) {
     return <span>{text}</span>
   }
@@ -27,11 +27,7 @@ export function HighlitableBySearch({
     <span>
       {before}
       <mark className="bg-yellow-400 text-black px-0.5 rounded">{match}</mark>
-      {after.includes(search) ? (
-        <HighlitableBySearch text={after} search={search} />
-      ) : (
-        after
-      )}
+      {after.includes(search) ? <HighlitableBySearch text={after} /> : after}
     </span>
   )
 }

@@ -17,12 +17,16 @@ type AppStore = {
 type State = {
   selectedAreasIds: Set<number>
   filterSearch: string
+  favoritedSpawns: Set<string>
+  showOnlyFavorited: boolean
 }
 
 type Actions = {
   toggleSelectedArea: (areaId: number) => void
   clearSelectedAreas: () => void
   setFilterSearch: (val: string) => void
+  toggleFavoritedSpawn: (spawnName: string) => void
+  toggleShowOnlyFavorited: () => void
 }
 
 export function useSelectedAreas() {
@@ -33,16 +37,26 @@ export function useFilterSearch() {
   return useAppStore((s) => s.state.filterSearch)
 }
 
+export function useFavoritedSpawns() {
+  return useAppStore((s) => s.state.favoritedSpawns)
+}
+
+export function useShowOnlyFavorited() {
+  return useAppStore((s) => s.state.showOnlyFavorited)
+}
+
 export function useAppStoreActions() {
   return useAppStore((s) => s.actions)
 }
 
 const useAppStore = create<AppStore>()(
   persist(
-    immer((set, get) => ({
+    immer((set) => ({
       state: {
         selectedAreasIds: new Set(),
         filterSearch: '',
+        favoritedSpawns: new Set(),
+        showOnlyFavorited: false,
       },
       actions: {
         toggleSelectedArea: (areaId) => {
@@ -62,6 +76,20 @@ const useAppStore = create<AppStore>()(
         setFilterSearch: (val) => {
           set((s) => {
             s.state.filterSearch = val
+          })
+        },
+        toggleFavoritedSpawn: (spawnName) => {
+          set((s) => {
+            if (s.state.favoritedSpawns.has(spawnName)) {
+              s.state.favoritedSpawns.delete(spawnName)
+            } else {
+              s.state.favoritedSpawns.add(spawnName)
+            }
+          })
+        },
+        toggleShowOnlyFavorited: () => {
+          set((s) => {
+            s.state.showOnlyFavorited = !s.state.showOnlyFavorited
           })
         },
       },
@@ -88,6 +116,7 @@ function makeStorage(): PersistStorage<AppStore> {
             selectedAreasIds: new Set(
               existingValue.state.state.selectedAreasIds,
             ),
+            favoritedSpawns: new Set(existingValue.state.state.favoritedSpawns),
           },
         },
       }
@@ -99,6 +128,7 @@ function makeStorage(): PersistStorage<AppStore> {
           state: {
             ...newValue.state.state,
             selectedAreasIds: Array.from(newValue.state.state.selectedAreasIds),
+            favoritedSpawns: Array.from(newValue.state.state.favoritedSpawns),
           },
           // actions are not persisted
         },

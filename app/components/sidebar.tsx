@@ -1,13 +1,31 @@
 import { AreaCheckbox } from '~/components/area-checkbox'
 import { useAreas } from '~/hooks/use-areas'
-import { useAppStoreActions, useSelectedAreas } from '~/lib/state'
+import {
+  useAppStoreActions,
+  useFilterSearch,
+  useSelectedAreas,
+  useShowOnlyFavorited,
+} from '~/lib/state'
 
 export function Sidebar() {
   const areas = useAreas()
   const selectedAreas = useSelectedAreas()
-  const { toggleSelectedArea } = useAppStoreActions()
+  const search = useFilterSearch()
+  const showOnlyFavorited = useShowOnlyFavorited()
+  const { toggleSelectedArea, setFilterSearch, toggleShowOnlyFavorited } =
+    useAppStoreActions()
 
   const showClearBtn = selectedAreas.size > 0
+
+  const handleToggleArea = (areaId: number) => {
+    if (search.trim()) {
+      setFilterSearch('')
+    }
+    if (showOnlyFavorited) {
+      toggleShowOnlyFavorited()
+    }
+    toggleSelectedArea(areaId)
+  }
 
   return (
     <aside className="w-max border-r border-r-neutral-700 p-4 space-y-3 overflow-y-auto">
@@ -19,7 +37,7 @@ export function Sidebar() {
             <AreaCheckbox
               key={a.id}
               checked={isSelected}
-              onChange={() => toggleSelectedArea(a.id)}
+              onChange={() => handleToggleArea(a.id)}
             >
               {a.name}
             </AreaCheckbox>
@@ -31,13 +49,23 @@ export function Sidebar() {
 }
 
 function ClearButton() {
-  const { clearSelectedAreas } = useAppStoreActions()
+  const { clearSelectedAreas, setFilterSearch, toggleShowOnlyFavorited } =
+    useAppStoreActions()
+  const showOnlyFavorited = useShowOnlyFavorited()
+
+  const handleClear = () => {
+    setFilterSearch('')
+    if (showOnlyFavorited) {
+      toggleShowOnlyFavorited()
+    }
+    clearSelectedAreas()
+  }
 
   return (
     <button
       className="btn btn-active btn-secondary w-full rounded-lg"
       type="button"
-      onClick={clearSelectedAreas}
+      onClick={handleClear}
     >
       Clear
     </button>

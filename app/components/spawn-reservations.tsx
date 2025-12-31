@@ -1,23 +1,49 @@
-import { useMemo } from 'react'
+import { Star } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
 import { Accordion } from '~/components/accordion'
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import { ReservationDisplay } from '~/components/reservation-display'
 import { useAreas } from '~/hooks/use-areas'
 import { useReservations } from '~/lib/api/react-query'
 import type { Area } from '~/lib/api/types'
-import { useFilterSearch, useSelectedAreas } from '~/lib/state'
 import {
-  hasMatchingPlayerInSpawn,
-  hasMatchingPlayerName,
-  hasMatchingSpawnName,
-  matchesSearchTerm,
-} from '~/utils/filtering'
+  useAppStoreActions,
+  useFavoritedSpawns,
+  useFilterSearch,
+  useSelectedAreas,
+  useShowOnlyFavorited,
+} from '~/lib/state'
+import { hasMatchingPlayerInSpawn, matchesSearchTerm } from '~/utils/filtering'
 
 export function SpawnReservations() {
   const areas = useAreas()
   const search = useFilterSearch()
   const selectedAreas = useSelectedAreas()
+  const showOnlyFavorited = useShowOnlyFavorited()
+  const favoritedSpawns = useFavoritedSpawns()
   const reservations = useReservations()
+
+  const getFilteredSpawns = useCallback(
+    (area: Area) => {
+      let spawns = area.respawns
+
+      if (showOnlyFavorited) {
+        spawns = spawns.filter((spawn) => favoritedSpawns.has(spawn))
+      }
+
+      if (search.trim()) {
+        spawns = spawns.filter((spawn) => {
+          return (
+            matchesSearchTerm(spawn, search) ||
+            hasMatchingPlayerInSpawn(spawn, area.id, search, reservations.data)
+          )
+        })
+      }
+
+      return spawns
+    },
+    [favoritedSpawns, showOnlyFavorited, search, reservations.data],
+  )
 
   const filtered = useMemo(() => {
     let result = areas
@@ -26,17 +52,10 @@ export function SpawnReservations() {
       result = result.filter((area) => selectedAreas.has(area.id))
     }
 
-    if (search.trim()) {
-      result = result.filter((area) => {
-        return (
-          hasMatchingSpawnName(area, search) ||
-          hasMatchingPlayerName(area.id, search, reservations.data)
-        )
-      })
-    }
+    result = result.filter((area) => getFilteredSpawns(area).length > 0)
 
     return result
-  }, [search, areas, selectedAreas, reservations.data])
+  }, [areas, selectedAreas, getFilteredSpawns])
 
   const noResults = !filtered.length
 
@@ -52,33 +71,22 @@ export function SpawnReservations() {
     <ul className="p-4 space-y-3">
       {filtered.map((a) => (
         <li key={a.id}>
-          <AreaAccordion area={a} />
+          <AreaAccordion area={a} filteredSpawns={getFilteredSpawns(a)} />
         </li>
       ))}
     </ul>
   )
 }
 
-function AreaAccordion({ area }: { area: Area }) {
-  const search = useFilterSearch()
-  const reservations = useReservations()
+type AreaAccordionProps = {
+  area: Area
+  filteredSpawns: string[]
+}
 
-  const filteredSpawns = useMemo(() => {
-    if (!search.trim()) return area.respawns
-
-    return area.respawns.filter((spawn) => {
-      return (
-        matchesSearchTerm(spawn, search) ||
-        hasMatchingPlayerInSpawn(spawn, area.id, search, reservations.data)
-      )
-    })
-  }, [search, area, reservations.data])
-
+function AreaAccordion({ area, filteredSpawns }: AreaAccordionProps) {
   return (
     <Accordion.Container name={`accordion-area-${area.id}`} open>
-      <Accordion.Title>
-        <HighlitableBySearch text={area.name} search={search} />
-      </Accordion.Title>
+      <Accordion.Title>{area.name}</Accordion.Title>
       <Accordion.Content className="space-y-3">
         {filteredSpawns.map((spawn) => (
           <SpawnAccordion key={spawn} spawn={spawn} areaId={area.id} />
@@ -94,8 +102,9 @@ type SpawnAccordionProps = {
 }
 
 function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
-  const search = useFilterSearch()
+  const { toggleFavoritedSpawn } = useAppStoreActions()
   const reservations = useReservations()
+  const favoritedSpawns = useFavoritedSpawns()
   const areaReservartions = reservations.data?.find((r) => r.id === areaId)
   const spawnReservations = areaReservartions?.respawnReservations.find(
     (r) => r.name === spawn,
@@ -105,8 +114,21 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
 
   return (
     <Accordion.Container name={`accordion-respawn-${spawn}`} open>
-      <Accordion.Title>
-        <HighlitableBySearch text={spawn} search={search} />
+      <Accordion.Title className="flex items-center gap-2">
+        <button
+          type="button"
+          className="btn btn-square bg-transparent border-none hover:bg-neutral"
+          onClick={(e) => {
+            e.stopPropagation()
+            toggleFavoritedSpawn(spawn)
+          }}
+        >
+          <Star
+            size={18}
+            fill={favoritedSpawns.has(spawn) ? 'yellow' : 'transparent'}
+          />
+        </button>
+        <HighlitableBySearch text={spawn} />
       </Accordion.Title>
       <Accordion.Content className="space-y-3">
         {isEmpty && (
