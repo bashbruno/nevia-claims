@@ -85,7 +85,7 @@ type AreaAccordionProps = {
 
 function AreaAccordion({ area, filteredSpawns }: AreaAccordionProps) {
   return (
-    <Accordion.Container name={`accordion-area-${area.id}`} open>
+    <Accordion.Container name={`accordion-area-${area.id}`}>
       <Accordion.Title>{area.name}</Accordion.Title>
       <Accordion.Content className="space-y-3">
         {filteredSpawns.map((spawn) => (
@@ -113,7 +113,7 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
   const isEmpty = !spawnReservations?.reservations.length
 
   return (
-    <Accordion.Container name={`accordion-respawn-${spawn}`} open>
+    <Accordion.Container name={`accordion-respawn-${spawn}`}>
       <Accordion.Title className="flex items-center gap-2">
         <button
           type="button"

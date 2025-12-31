@@ -2,6 +2,7 @@ import { createContext, type PropsWithChildren, useContext } from 'react'
 import { Header } from '~/components/header'
 import { Sidebar } from '~/components/sidebar'
 import type { AreasResponse } from '~/lib/api/types'
+import { useHasHydrated } from '~/lib/state'
 
 type AppContext = {
   areas: AreasResponse
@@ -20,6 +21,16 @@ type AppLayoutProps = PropsWithChildren<{
 }>
 
 export function AppLayout({ children, areas }: AppLayoutProps) {
+  const hasHydrated = useHasHydrated()
+
+  if (!hasHydrated) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <span className="loading loading-dots loading-xl"></span>
+      </div>
+    )
+  }
+
   return (
     <AppLayoutContext.Provider value={{ areas }}>
       <div className="h-screen flex flex-col">

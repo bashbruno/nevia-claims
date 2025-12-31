@@ -19,6 +19,8 @@ type State = {
   filterSearch: string
   favoritedSpawns: Set<string>
   showOnlyFavorited: boolean
+  openAccordions: Set<string>
+  hasHydrated: boolean
 }
 
 type Actions = {
@@ -27,6 +29,7 @@ type Actions = {
   setFilterSearch: (val: string) => void
   toggleFavoritedSpawn: (spawnName: string) => void
   toggleShowOnlyFavorited: () => void
+  toggleAccordion: (accordionName: string) => void
 }
 
 export function useSelectedAreas() {
@@ -45,8 +48,17 @@ export function useShowOnlyFavorited() {
   return useAppStore((s) => s.state.showOnlyFavorited)
 }
 
+export function useIsAccordionOpen(accordionName: string) {
+  const accordions = useAppStore((s) => s.state.openAccordions)
+  return accordions.has(accordionName)
+}
+
 export function useAppStoreActions() {
   return useAppStore((s) => s.actions)
+}
+
+export function useHasHydrated() {
+  return useAppStore((s) => s.state.hasHydrated)
 }
 
 const useAppStore = create<AppStore>()(
@@ -57,6 +69,8 @@ const useAppStore = create<AppStore>()(
         filterSearch: '',
         favoritedSpawns: new Set(),
         showOnlyFavorited: false,
+        openAccordions: new Set(),
+        hasHydrated: false,
       },
       actions: {
         toggleSelectedArea: (areaId) => {
@@ -92,11 +106,25 @@ const useAppStore = create<AppStore>()(
             s.state.showOnlyFavorited = !s.state.showOnlyFavorited
           })
         },
+        toggleAccordion: (accordionName) => {
+          set((s) => {
+            if (s.state.openAccordions.has(accordionName)) {
+              s.state.openAccordions.delete(accordionName)
+            } else {
+              s.state.openAccordions.add(accordionName)
+            }
+          })
+        },
       },
     })),
     {
       name: 'app-storage',
       storage: makeStorage(),
+      onRehydrateStorage: () => (state) => {
+        if (state?.state) {
+          state.state.hasHydrated = true
+        }
+      },
     },
   ),
 )
@@ -117,6 +145,7 @@ function makeStorage(): PersistStorage<AppStore> {
               existingValue.state.state.selectedAreasIds,
             ),
             favoritedSpawns: new Set(existingValue.state.state.favoritedSpawns),
+            openAccordions: new Set(existingValue.state.state.openAccordions),
           },
         },
       }
@@ -129,6 +158,7 @@ function makeStorage(): PersistStorage<AppStore> {
             ...newValue.state.state,
             selectedAreasIds: Array.from(newValue.state.state.selectedAreasIds),
             favoritedSpawns: Array.from(newValue.state.state.favoritedSpawns),
+            openAccordions: Array.from(newValue.state.state.openAccordions),
           },
           // actions are not persisted
         },
