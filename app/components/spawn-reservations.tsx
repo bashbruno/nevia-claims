@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Accordion } from '~/components/accordion'
+import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import { ReservationDisplay } from '~/components/reservation-display'
 import { useAreas } from '~/hooks/use-areas'
 import { useReservations } from '~/lib/api/react-query'
@@ -37,6 +38,16 @@ export function SpawnReservations() {
     return result
   }, [search, areas, selectedAreas, reservations.data])
 
+  const noResults = !filtered.length
+
+  if (noResults) {
+    return (
+      <div className="flex items-center justify-center h-full text-neutral-400">
+        <p>No results found.</p>
+      </div>
+    )
+  }
+
   return (
     <ul className="p-4 space-y-3">
       {filtered.map((a) => (
@@ -65,7 +76,9 @@ function AreaAccordion({ area }: { area: Area }) {
 
   return (
     <Accordion.Container name={`accordion-area-${area.id}`} open>
-      <Accordion.Title>{area.name}</Accordion.Title>
+      <Accordion.Title>
+        <HighlitableBySearch text={area.name} search={search} />
+      </Accordion.Title>
       <Accordion.Content className="space-y-3">
         {filteredSpawns.map((spawn) => (
           <SpawnAccordion key={spawn} spawn={spawn} areaId={area.id} />
@@ -81,6 +94,7 @@ type SpawnAccordionProps = {
 }
 
 function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
+  const search = useFilterSearch()
   const reservations = useReservations()
   const areaReservartions = reservations.data?.find((r) => r.id === areaId)
   const spawnReservations = areaReservartions?.respawnReservations.find(
@@ -91,7 +105,9 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
 
   return (
     <Accordion.Container name={`accordion-respawn-${spawn}`} open>
-      <Accordion.Title>{spawn}</Accordion.Title>
+      <Accordion.Title>
+        <HighlitableBySearch text={spawn} search={search} />
+      </Accordion.Title>
       <Accordion.Content className="space-y-3">
         {isEmpty && (
           <p className="text-center">
