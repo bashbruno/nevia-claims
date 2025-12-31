@@ -11,7 +11,10 @@ function Container(props: ComponentProps<'details'>) {
   return (
     <details
       {...props}
-      className={cn('collapse bg-secondary/20', props.className)}
+      className={cn(
+        'collapse bg-secondary/10 border border-secondary/30 rounded-lg',
+        props.className,
+      )}
     />
   )
 }
@@ -29,7 +32,10 @@ function Content(props: ComponentProps<'div'>) {
   return (
     <div
       {...props}
-      className={cn('collapse-content text-sm', props.className)}
+      className={cn(
+        'collapse-content text-sm bg-secondary/5 pt-4',
+        props.className,
+      )}
     />
   )
 }

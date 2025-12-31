@@ -7,17 +7,14 @@ export function Sidebar() {
   const selectedAreas = useSelectedAreas()
   const { toggleSelectedArea } = useAppStoreActions()
 
-  const showClearBtn = Array.from(selectedAreas.values()).some(
-    (value) => value === true,
-  )
+  const showClearBtn = selectedAreas.size > 0
 
   return (
-    <aside className="w-max border-r border-r-secondary p-4 space-y-3">
+    <aside className="w-max border-r border-r-neutral-700 p-4 space-y-3 overflow-y-auto">
       {showClearBtn && <ClearButton />}
-      <h2 className="font-semibold">Filter Area</h2>
       <ul className="flex flex-col">
         {areas.map((a) => {
-          const isSelected = selectedAreas.get(a.id) ?? false
+          const isSelected = selectedAreas.has(a.id)
           return (
             <AreaCheckbox
               key={a.id}
@@ -35,9 +32,10 @@ export function Sidebar() {
 
 function ClearButton() {
   const { clearSelectedAreas } = useAppStoreActions()
+
   return (
     <button
-      className="btn btn-active btn-accent w-full"
+      className="btn btn-active btn-secondary w-full rounded-lg"
       type="button"
       onClick={clearSelectedAreas}
     >

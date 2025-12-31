@@ -4,7 +4,7 @@ import { ReservationDisplay } from '~/components/reservation-display'
 import { useAreas } from '~/hooks/use-areas'
 import { useReservations } from '~/lib/api/react-query'
 import type { Area } from '~/lib/api/types'
-import { useFilterSearch } from '~/lib/state'
+import { useFilterSearch, useSelectedAreas } from '~/lib/state'
 import {
   hasMatchingPlayerInSpawn,
   hasMatchingPlayerName,
@@ -15,17 +15,27 @@ import {
 export function SpawnReservations() {
   const areas = useAreas()
   const search = useFilterSearch()
+  const selectedAreas = useSelectedAreas()
   const reservations = useReservations()
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return areas
-    return areas.filter((area) => {
-      return (
-        hasMatchingSpawnName(area, search) ||
-        hasMatchingPlayerName(area.id, search, reservations.data)
-      )
-    })
-  }, [search, areas, reservations.data])
+    let result = areas
+
+    if (selectedAreas.size > 0) {
+      result = result.filter((area) => selectedAreas.has(area.id))
+    }
+
+    if (search.trim()) {
+      result = result.filter((area) => {
+        return (
+          hasMatchingSpawnName(area, search) ||
+          hasMatchingPlayerName(area.id, search, reservations.data)
+        )
+      })
+    }
+
+    return result
+  }, [search, areas, selectedAreas, reservations.data])
 
   return (
     <ul className="p-4 space-y-3">
@@ -83,7 +93,11 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
     <Accordion.Container name={`accordion-respawn-${spawn}`} open>
       <Accordion.Title>{spawn}</Accordion.Title>
       <Accordion.Content className="space-y-3">
-        {isEmpty && <p>This spawn has no claims. It's completely free!</p>}
+        {isEmpty && (
+          <p className="text-center">
+            This spawn has no claims. It's completely free!
+          </p>
+        )}
         {spawnReservations?.reservations.map((r) => (
           <ReservationDisplay key={r.id} reservation={r} />
         ))}

@@ -10,10 +10,7 @@ export function SearchInput({ label, className, ...props }: Props) {
     <label className="floating-label">
       <input
         type="search"
-        className={cn(
-          'input input-secondary input-lg font-medium w-full max-w-96',
-          className,
-        )}
+        className={cn('input input-lg font-medium w-full max-w-96', className)}
         {...props}
       />
       <span>{label}</span>

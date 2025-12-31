@@ -14,9 +14,9 @@ export function ReservationDisplay({ reservation }: Props) {
   return (
     <div
       className={cn(
-        'bg-accent/15 border border-accent/15 p-2 rounded-md flex items-center justify-between',
+        'bg-neutral p-2 rounded-md flex items-center justify-between',
         {
-          'bg-purple-900 border-purple-700': isAdvanceClaim,
+          'bg-purple-900/80 border border-purple-700': isAdvanceClaim,
         },
       )}
     >

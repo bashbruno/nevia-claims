@@ -15,7 +15,7 @@ type AppStore = {
 }
 
 type State = {
-  selectedAreasIds: Map<number, boolean>
+  selectedAreasIds: Set<number>
   filterSearch: string
 }
 
@@ -41,14 +41,17 @@ const useAppStore = create<AppStore>()(
   persist(
     immer((set, get) => ({
       state: {
-        selectedAreasIds: new Map(),
+        selectedAreasIds: new Set(),
         filterSearch: '',
       },
       actions: {
         toggleSelectedArea: (areaId) => {
-          const newVal = !get().state.selectedAreasIds.get(areaId)
           set((s) => {
-            s.state.selectedAreasIds.set(areaId, newVal)
+            if (s.state.selectedAreasIds.has(areaId)) {
+              s.state.selectedAreasIds.delete(areaId)
+            } else {
+              s.state.selectedAreasIds.add(areaId)
+            }
           })
         },
         clearSelectedAreas: () => {
@@ -82,7 +85,7 @@ function makeStorage(): PersistStorage<AppStore> {
           ...existingValue.state,
           state: {
             ...existingValue.state.state,
-            selectedAreasIds: new Map(
+            selectedAreasIds: new Set(
               existingValue.state.state.selectedAreasIds,
             ),
           },
@@ -95,9 +98,7 @@ function makeStorage(): PersistStorage<AppStore> {
         state: {
           state: {
             ...newValue.state.state,
-            selectedAreasIds: Array.from(
-              newValue.state.state.selectedAreasIds.entries(),
-            ),
+            selectedAreasIds: Array.from(newValue.state.state.selectedAreasIds),
           },
           // actions are not persisted
         },

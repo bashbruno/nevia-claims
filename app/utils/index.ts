@@ -34,12 +34,11 @@ export function formatDate(val: string) {
 }
 
 export function getIsAdvanceClaim(startDate: string) {
-  const date = parseISO(startDate)
-  const isSameOrAfter10 = date.getHours() >= 10
-
   const startDateCET = new TZDate(startDate, 'Europe/Berlin')
-  const now = new Date()
-  const isBeforeStart = now < startDateCET
+  const isSameOrAfter10 = startDateCET.getHours() >= 10
 
-  return isSameOrAfter10 && isBeforeStart
+  const nowCET = new TZDate(new Date(), 'Europe/Berlin')
+  const isCurrentlyBefore10 = nowCET.getHours() < 10
+
+  return isSameOrAfter10 && isCurrentlyBefore10
 }

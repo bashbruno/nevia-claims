@@ -6,7 +6,7 @@ export function Header() {
   const { setFilterSearch } = useAppStoreActions()
 
   return (
-    <header className="p-4 border-b border-b-secondary space-y-4">
+    <header className="p-4 border-b border-b-neutral-700 space-y-4">
       <h1 className="text-2xl font-semibold">Nevia Claims</h1>
       <SearchInput
         label="Search spawn or player name"
