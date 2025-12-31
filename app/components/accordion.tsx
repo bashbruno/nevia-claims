@@ -25,6 +25,7 @@ function Container({ forceOpen, ...props }: ContainerProps) {
   return (
     <details
       {...props}
+      key={`${name}-${forceOpen ? 'forced' : 'normal'}`}
       open={open}
       onToggle={(e) => {
         // Don't persist state changes when forceOpen is active
