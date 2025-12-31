@@ -28,7 +28,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-max border-r border-r-neutral-700 p-4 space-y-3 overflow-y-auto">
+    <aside className="w-64 border-r border-r-neutral-700 p-4 space-y-3 overflow-y-auto">
       {showClearBtn && <ClearButton />}
       <ul className="flex flex-col">
         {areas.map((a) => {

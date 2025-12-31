@@ -1,5 +1,6 @@
 import { Star } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
+import { Virtuoso } from 'react-virtuoso'
 import { Accordion } from '~/components/accordion'
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import { ReservationDisplay } from '~/components/reservation-display'
@@ -68,13 +69,17 @@ export function SpawnReservations() {
   }
 
   return (
-    <ul className="p-4 space-y-3">
-      {filtered.map((a) => (
-        <li key={a.id}>
-          <AreaAccordion area={a} filteredSpawns={getFilteredSpawns(a)} />
-        </li>
-      ))}
-    </ul>
+    <div className="h-full p-4">
+      <Virtuoso
+        style={{ height: '100%' }}
+        data={filtered}
+        itemContent={(idx, a) => (
+          <div style={{ paddingTop: idx === 0 ? 0 : 12 }}>
+            <AreaAccordion area={a} filteredSpawns={getFilteredSpawns(a)} />
+          </div>
+        )}
+      />
+    </div>
   )
 }
 
