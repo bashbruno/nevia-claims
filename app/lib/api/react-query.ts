@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { getApiReservations } from '~/lib/api/functions'
 import { time } from '~/utils'
 
@@ -11,3 +11,7 @@ export const reservationsQueryOpts = queryOptions({
   queryFn: getApiReservations,
   refetchInterval: time.second * 5,
 })
+
+export function useReservations() {
+  return useQuery(reservationsQueryOpts)
+}

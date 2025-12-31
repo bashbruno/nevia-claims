@@ -11,7 +11,7 @@ export function SearchInput({ label, className, ...props }: Props) {
       <input
         type="search"
         className={cn(
-          'input input-secondary input-lg font-medium w-full',
+          'input input-secondary input-lg font-medium w-full max-w-96',
           className,
         )}
         {...props}

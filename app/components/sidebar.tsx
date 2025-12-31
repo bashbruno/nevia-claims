@@ -1,9 +1,9 @@
-import { useAppContext } from '~/components/app-layout'
 import { AreaCheckbox } from '~/components/area-checkbox'
+import { useAreas } from '~/hooks/use-areas'
 import { useAppStoreActions, useSelectedAreas } from '~/lib/state'
 
 export function Sidebar() {
-  const { areas } = useAppContext()
+  const areas = useAreas()
   const selectedAreas = useSelectedAreas()
   const { toggleSelectedArea } = useAppStoreActions()
 

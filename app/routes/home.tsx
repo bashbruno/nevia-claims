@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { AppLayout } from '~/components/app-layout'
+import { SpawnReservations } from '~/components/spawn-reservations'
 import { getAreas, getReservations } from '~/lib/api/functions'
 import { reservationsQueryOpts } from '~/lib/api/react-query'
 import type { Route } from './+types/home'
@@ -32,5 +33,9 @@ export default function Home({
     initialData: loaderReservations,
   })
 
-  return <AppLayout areas={areas}>toma</AppLayout>
+  return (
+    <AppLayout areas={areas}>
+      <SpawnReservations />
+    </AppLayout>
+  )
 }
