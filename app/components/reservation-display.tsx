@@ -15,7 +15,7 @@ export function ReservationDisplay({ reservation }: Props) {
   return (
     <div
       className={cn(
-        'bg-neutral p-2 rounded-md flex items-center justify-between',
+        'bg-neutral p-2 rounded-md flex flex-col gap-2 md:items-center md:justify-between md:flex-row',
         {
           'bg-purple-900/80 border border-purple-700': isAdvanceClaim,
         },
@@ -27,7 +27,7 @@ export function ReservationDisplay({ reservation }: Props) {
         </p>
         <p className="font-light text-xs">{startDate}</p>
       </div>
-      <p className="font-semibold flex flex-col items-center text-base">
+      <p className="font-semibold flex flex-col items-center text-sm md:text-base">
         {isAdvanceClaim && <span className="text-xs">(In Advance)</span>}
         <span>
           <HighlitableBySearch text={reservation.characterName} />

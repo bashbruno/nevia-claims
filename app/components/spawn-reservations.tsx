@@ -101,7 +101,9 @@ function AreaAccordion({ area, filteredSpawns }: AreaAccordionProps) {
       forceOpen={hasActiveSearch}
     >
       <Accordion.Title>
-        <span className="hover:underline underline-offset-2">{area.name}</span>
+        <span className="hover:underline underline-offset-2 text-sm md:text-base">
+          {area.name}
+        </span>
       </Accordion.Title>
       <Accordion.Content className="space-y-3">
         {filteredSpawns.map((spawn) => (
@@ -136,7 +138,7 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
       name={`accordion-respawn-${spawn}`}
       forceOpen={hasActiveSearch}
     >
-      <Accordion.Title className="flex items-center gap-2">
+      <Accordion.Title className="flex gap-2 items-center">
         <button
           type="button"
           className="btn btn-square bg-transparent border-none hover:bg-neutral"
@@ -168,7 +170,7 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
       </Accordion.Title>
       <Accordion.Content className="space-y-3">
         {isEmpty && (
-          <p className="text-center">
+          <p className="text-center text-xs md:text-sm">
             This spawn has no claims. It's completely free!
           </p>
         )}

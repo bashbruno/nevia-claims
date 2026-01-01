@@ -1,10 +1,10 @@
-import { Star } from 'lucide-react'
+import { MobileSidebar } from '~/components/mobile-sidebar'
+import { SearchInput } from '~/components/search-input'
 import {
   useAppStoreActions,
   useFilterSearch,
   useShowOnlyFavorited,
 } from '~/lib/state'
-import { SearchInput } from './search-input'
 
 export function Header() {
   const search = useFilterSearch()
@@ -32,7 +32,10 @@ export function Header() {
 
   return (
     <header className="p-4 border-b border-b-neutral-700 space-y-4">
-      <h1 className="text-2xl font-semibold">Nevia Claims</h1>
+      <div className="grid grid-cols-2 items-center">
+        <h1 className="text-lg lg:text-2xl font-semibold">Nevia Claims</h1>
+        <MobileSidebar />
+      </div>
       <SearchInput
         label="Search spawn or player name"
         placeholder="Search spawn or player name"
@@ -46,7 +49,7 @@ export function Header() {
           checked={showOnlyFavorited}
           onChange={handleToggleFavorites}
         />
-        <span className="label-text hover:underline underline-offset-2">
+        <span className="label-text hover:underline underline-offset-2 text-sm md:text-base">
           Show favorites
         </span>
       </label>

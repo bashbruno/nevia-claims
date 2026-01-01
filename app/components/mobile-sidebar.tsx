@@ -1,3 +1,4 @@
+import { Menu } from 'lucide-react'
 import { AreaCheckbox } from '~/components/area-checkbox'
 import { useAreas } from '~/hooks/use-areas'
 import {
@@ -7,7 +8,7 @@ import {
   useShowOnlyFavorited,
 } from '~/lib/state'
 
-export function Sidebar() {
+export function MobileSidebar() {
   const areas = useAreas()
   const selectedAreas = useSelectedAreas()
   const search = useFilterSearch()
@@ -28,23 +29,39 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden lg:block w-64 border-r border-r-neutral-700 p-4 space-y-3 overflow-y-auto">
-      {showClearBtn && <ClearButton />}
-      <ul className="flex flex-col">
-        {areas.map((a) => {
-          const isSelected = selectedAreas.has(a.id)
-          return (
-            <AreaCheckbox
-              key={a.id}
-              checked={isSelected}
-              onChange={() => handleToggleArea(a.id)}
-            >
-              {a.name}
-            </AreaCheckbox>
-          )
-        })}
-      </ul>
-    </aside>
+    <div className="drawer lg:hidden">
+      <input id="my-drawer-1" type="checkbox" className="drawer-toggle" />
+      <div className="drawer-content flex justify-end">
+        <label
+          htmlFor="my-drawer-1"
+          className="btn btn-ghost drawer-button pr-0"
+        >
+          <Menu />
+        </label>
+      </div>
+      <div className="drawer-side">
+        <label
+          htmlFor="my-drawer-1"
+          aria-label="close sidebar"
+          className="drawer-overlay"
+        ></label>
+        <ul className="flex flex-col menu bg-base-200 min-h-full w-80 p-4">
+          {showClearBtn && <ClearButton />}
+          {areas.map((a) => {
+            const isSelected = selectedAreas.has(a.id)
+            return (
+              <AreaCheckbox
+                key={a.id}
+                checked={isSelected}
+                onChange={() => handleToggleArea(a.id)}
+              >
+                {a.name}
+              </AreaCheckbox>
+            )
+          })}
+        </ul>
+      </div>
+    </div>
   )
 }
 
