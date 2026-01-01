@@ -1,3 +1,4 @@
+import NiceModal from '@ebay/nice-modal-react'
 import { createContext, type PropsWithChildren, useContext } from 'react'
 import { Header } from '~/components/header'
 import { Sidebar } from '~/components/sidebar'
@@ -33,13 +34,15 @@ export function AppLayout({ children, areas }: AppLayoutProps) {
 
   return (
     <AppLayoutContext.Provider value={{ areas }}>
-      <div className="h-screen flex flex-col">
-        <Header />
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+      <NiceModal.Provider>
+        <div className="h-screen flex flex-col">
+          <Header />
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar />
+            <main className="flex-1 overflow-y-auto">{children}</main>
+          </div>
         </div>
-      </div>
+      </NiceModal.Provider>
     </AppLayoutContext.Provider>
   )
 }

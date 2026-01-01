@@ -74,3 +74,28 @@ export function getIsAdvanceClaim(startDate: string) {
     startDateCET.getTime() === next10AM.getTime()
   )
 }
+
+/**
+ * @returns the ok status of the clipboard action
+ */
+export async function copyToClipboard(val: string) {
+  try {
+    await navigator.clipboard.writeText(val)
+    return true
+  } catch (err) {
+    console.error('Failed to copy: ', err)
+    return false
+  }
+}
+
+export function buildClaimCommand(
+  areaName: string,
+  spawnName: string,
+  start: string | undefined,
+  end: string | undefined,
+  character: string | undefined,
+) {
+  // /claim area:(Ingol) Ingol -1 start:21 end:22 character:Very Pog
+  const cmd = `/claim area:(${areaName}) ${spawnName} start:${start} end:${end} character:${character}`
+  return cmd
+}

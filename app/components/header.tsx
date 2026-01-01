@@ -46,7 +46,9 @@ export function Header() {
           checked={showOnlyFavorited}
           onChange={handleToggleFavorites}
         />
-        <span className="label-text">Show favorites</span>
+        <span className="label-text hover:underline underline-offset-2">
+          Show favorites
+        </span>
       </label>
     </header>
   )

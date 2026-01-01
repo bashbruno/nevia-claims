@@ -1,11 +1,9 @@
+import NiceModal from '@ebay/nice-modal-react'
 import { Hand, Star } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { Accordion } from '~/components/accordion'
-import {
-  CLAIM_SPAWN_MODAL_ID,
-  ClaimSpawnModal,
-} from '~/components/claim-spawn-modal'
+import { ClaimSpawnModal } from '~/components/claim-spawn-modal'
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import { ReservationDisplay } from '~/components/reservation-display'
 import { useAreas } from '~/hooks/use-areas'
@@ -83,7 +81,6 @@ export function SpawnReservations() {
           </div>
         )}
       />
-      <ClaimSpawnModal />
     </div>
   )
 }
@@ -153,17 +150,18 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
             fill={favoritedSpawns.has(spawn) ? 'yellow' : 'transparent'}
           />
         </button>
+
         <button
           type="button"
           className="btn btn-square bg-transparent border-none hover:bg-neutral"
           onClick={(e) => {
             e.stopPropagation()
-            // @ts-expect-error daisyUI component
-            document.getElementById(CLAIM_SPAWN_MODAL_ID)?.showModal()
+            NiceModal.show(ClaimSpawnModal, { spawnName: spawn, areaId })
           }}
         >
           <Hand size={18} />
         </button>
+
         <span className="hover:underline underline-offset-2">
           <HighlitableBySearch text={spawn} />
         </span>
