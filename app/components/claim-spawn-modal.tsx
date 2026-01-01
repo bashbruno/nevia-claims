@@ -114,11 +114,17 @@ function ClaimForm({ onConfirm }: ClaimFormProps) {
   return (
     <form onSubmit={handleConfirm} className="space-y-5">
       <h3 className="font-bold text-lg">Claim Spawn</h3>
-      <ClaimTimeInput placeholder="Start" name="start" ref={startInputRef} />
-      <ClaimTimeInput placeholder="End" name="end" />
+      <ClaimTimeInput
+        placeholder="Start"
+        name="start"
+        ref={startInputRef}
+        required
+      />
+      <ClaimTimeInput placeholder="End" name="end" required />
       <ClaimTimeInput
         name="character"
         placeholder="Character"
+        required
         value={characterName}
         onChange={(e) => setCharacterName(e.target.value)}
       />
