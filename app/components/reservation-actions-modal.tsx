@@ -19,26 +19,9 @@ export const ReservationActionsModal = NiceModal.create(
 
     useModalEscapeKey(modal)
 
-    const googleCalendarUrl = getCalendarUrl(
-      'google',
-      spawnName,
-      reservation.startDate,
-      reservation.endDate,
-    )
-
-    const outlookCalendarUrl = getCalendarUrl(
-      'outlook',
-      spawnName,
-      reservation.startDate,
-      reservation.endDate,
-    )
-
-    const officeCalendarUrl = getCalendarUrl(
-      'office',
-      spawnName,
-      reservation.startDate,
-      reservation.endDate,
-    )
+    const googleCalendarUrl = getCalendarUrl('google', spawnName, reservation)
+    const outlookCalendarUrl = getCalendarUrl('outlook', spawnName, reservation)
+    const officeCalendarUrl = getCalendarUrl('office', spawnName, reservation)
 
     return (
       <dialog

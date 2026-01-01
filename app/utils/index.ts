@@ -3,6 +3,7 @@ import { type CalendarEvent, google, office365, outlook } from 'calendar-link'
 import { type ClassValue, clsx } from 'clsx'
 import { format, isAfter, parseISO } from 'date-fns'
 import { twMerge } from 'tailwind-merge'
+import type { Reservation } from '~/lib/api/types'
 
 export const time = Object.freeze({
   millisecond: 1,
@@ -136,7 +137,7 @@ function makeCalendarEvent(
   endDate: string,
 ): CalendarEvent {
   return {
-    title: `Claim ${title}`,
+    title,
     start: formatDateForCalendar(startDate),
     end: formatDateForCalendar(endDate),
   }
@@ -144,11 +145,15 @@ function makeCalendarEvent(
 
 export function getCalendarUrl(
   calendar: 'google' | 'outlook' | 'office',
-  title: string,
-  startDate: string,
-  endDate: string,
+  spawnName: string,
+  reservation: Reservation,
 ) {
-  const evt = makeCalendarEvent(title, startDate, endDate)
+  const evt = makeCalendarEvent(
+    `Claim ${spawnName} (${reservation.characterName})`,
+    reservation.startDate,
+    reservation.endDate,
+  )
+
   switch (calendar) {
     case 'google':
       return google(evt)
