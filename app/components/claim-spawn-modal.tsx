@@ -51,7 +51,11 @@ export const ClaimSpawnModal = NiceModal.create(
           {!targetArea ? (
             <ErrorState />
           ) : (
-            <ClaimForm onConfirm={handleCopyClaim} />
+            <ClaimForm
+              onConfirm={handleCopyClaim}
+              areaName={targetArea.name}
+              spawnName={spawnName}
+            />
           )}
         </div>
         <form method="dialog" className="modal-backdrop">
@@ -70,16 +74,28 @@ type ClaimFormProps = {
     end: string | undefined,
     character: string | undefined,
   ) => Promise<void>
+  areaName: string
+  spawnName: string
 }
 
-function ClaimForm({ onConfirm }: ClaimFormProps) {
+function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
   const [copied, setCopied] = useState(false)
+  const [timeValues, setTimeValues] = useState({ start: '', end: '' })
+
   const modal = useModal()
   const startInputRef = useRef<HTMLInputElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const characterName = useCharacterName()
   const { setCharacterName } = useAppStoreActions()
+
+  const commandPreview = buildClaimCommand(
+    areaName,
+    spawnName,
+    timeValues.start || undefined,
+    timeValues.end || undefined,
+    characterName || undefined,
+  )
 
   useEffect(() => {
     if (modal.visible && startInputRef.current) {
@@ -97,13 +113,21 @@ function ClaimForm({ onConfirm }: ClaimFormProps) {
 
   async function handleConfirm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const form = e.target as HTMLFormElement
-    const fd = new FormData(form)
-    await onConfirm(
-      fd.get('start')?.toString(),
-      fd.get('end')?.toString(),
-      fd.get('character')?.toString(),
-    )
+
+    // Remove trailing colon from time values if present
+    const cleanStart = timeValues.start.endsWith(':')
+      ? timeValues.start.slice(0, -1)
+      : timeValues.start
+    const cleanEnd = timeValues.end.endsWith(':')
+      ? timeValues.end.slice(0, -1)
+      : timeValues.end
+
+    setTimeValues({
+      start: cleanStart,
+      end: cleanEnd,
+    })
+
+    await onConfirm(cleanStart, cleanEnd, characterName)
     setCopied(true)
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -119,8 +143,20 @@ function ClaimForm({ onConfirm }: ClaimFormProps) {
         name="start"
         ref={startInputRef}
         required
+        value={timeValues.start}
+        onChange={(e) =>
+          setTimeValues((prev) => ({ ...prev, start: e.target.value }))
+        }
       />
-      <ClaimTimeInput placeholder="End" name="end" required />
+      <ClaimTimeInput
+        placeholder="End"
+        name="end"
+        required
+        value={timeValues.end}
+        onChange={(e) =>
+          setTimeValues((prev) => ({ ...prev, end: e.target.value }))
+        }
+      />
       <ClaimTimeInput
         name="character"
         placeholder="Character"
@@ -128,6 +164,9 @@ function ClaimForm({ onConfirm }: ClaimFormProps) {
         value={characterName}
         onChange={(e) => setCharacterName(e.target.value)}
       />
+      <div className="rounded-lg bg-base-300 p-3">
+        <code className="text-sm break-all">{commandPreview}</code>
+      </div>
       <div className="flex justify-end">
         <button type="submit" className="btn btn-neutral">
           {!copied && (

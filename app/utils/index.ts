@@ -98,7 +98,7 @@ export function buildClaimCommand(
   character: string | undefined,
 ) {
   // /claim area:(Ingol) Ingol -1 start:21 end:22 character:Very Pog
-  const cmd = `/claim area:(${areaName}) ${spawnName} start:${start} end:${end} character:${character}`
+  const cmd = `/claim area:(${areaName}) ${spawnName} start:${start ?? ''} end:${end ?? ''} character:${character ?? ''}`
   return cmd
 }
 
