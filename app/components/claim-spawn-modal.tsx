@@ -76,6 +76,7 @@ function ClaimForm({ onConfirm }: ClaimFormProps) {
   const [copied, setCopied] = useState(false)
   const modal = useModal()
   const startInputRef = useRef<HTMLInputElement>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const characterName = useCharacterName()
   const { setCharacterName } = useAppStoreActions()
@@ -85,6 +86,14 @@ function ClaimForm({ onConfirm }: ClaimFormProps) {
       startInputRef.current.focus()
     }
   }, [modal.visible])
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   async function handleConfirm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -96,6 +105,10 @@ function ClaimForm({ onConfirm }: ClaimFormProps) {
       fd.get('character')?.toString(),
     )
     setCopied(true)
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    timeoutRef.current = setTimeout(() => setCopied(false), 2500)
   }
 
   return (
