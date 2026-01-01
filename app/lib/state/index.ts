@@ -133,9 +133,11 @@ const useAppStore = create<AppStore>()(
       name: 'app-storage',
       storage: makeStorage(),
       onRehydrateStorage: () => (state) => {
-        if (state?.state) {
-          state.state.hasHydrated = true
-        }
+        setTimeout(() => {
+          if (state?.state) {
+            state.state.hasHydrated = true
+          }
+        }, 1000)
       },
     },
   ),
