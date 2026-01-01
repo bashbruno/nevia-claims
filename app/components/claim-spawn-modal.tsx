@@ -83,6 +83,7 @@ function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
   const [timeValues, setTimeValues] = useState({ start: '', end: '' })
 
   const modal = useModal()
+  const startInputRef = useRef<HTMLInputElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const characterName = useCharacterName()
@@ -95,6 +96,12 @@ function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
     timeValues.end || undefined,
     characterName || undefined,
   )
+
+  useEffect(() => {
+    if (modal.visible && startInputRef.current) {
+      startInputRef.current.focus()
+    }
+  }, [modal.visible])
 
   useEffect(() => {
     return () => {
@@ -134,8 +141,7 @@ function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
       <ClaimTimeInput
         placeholder="Start"
         name="start"
-        autoFocus
-        inputMode="tel"
+        ref={startInputRef}
         required
         value={timeValues.start}
         onChange={(e) =>
@@ -145,7 +151,6 @@ function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
       <ClaimTimeInput
         placeholder="End"
         name="end"
-        inputMode="tel"
         required
         value={timeValues.end}
         onChange={(e) =>
