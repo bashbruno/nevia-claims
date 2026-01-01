@@ -1,12 +1,16 @@
+import NiceModal from '@ebay/nice-modal-react'
+import { Ellipsis } from 'lucide-react'
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import type { Reservation } from '~/lib/api/types'
 import { cn, formatDate, formatTime, getIsAdvanceClaim } from '~/utils'
+import { ReservationActionsModal } from './reservation-actions-modal'
 
 type Props = {
   reservation: Reservation
+  spawnName: string
 }
 
-export function ReservationDisplay({ reservation }: Props) {
+export function ReservationDisplay({ reservation, spawnName }: Props) {
   const isAdvanceClaim = getIsAdvanceClaim(reservation.startDate)
   const startTime = formatTime(reservation.startDate)
   const endTime = formatTime(reservation.endDate)
@@ -33,7 +37,18 @@ export function ReservationDisplay({ reservation }: Props) {
           <HighlitableBySearch text={reservation.characterName} />
         </span>
       </p>
-      <div />
+      <div>
+        <button
+          type="button"
+          className="btn btn-square bg-transparent border-none hover:bg-white/5"
+          onClick={(e) => {
+            e.stopPropagation()
+            NiceModal.show(ReservationActionsModal, { spawnName, reservation })
+          }}
+        >
+          <Ellipsis size={18} />
+        </button>
+      </div>
     </div>
   )
 }

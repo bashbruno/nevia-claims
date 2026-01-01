@@ -1,4 +1,5 @@
-import { TZDate, tz } from '@date-fns/tz'
+import { TZDate } from '@date-fns/tz'
+import { type CalendarEvent, google, office365, outlook } from 'calendar-link'
 import { type ClassValue, clsx } from 'clsx'
 import { format, isAfter, parseISO } from 'date-fns'
 import { twMerge } from 'tailwind-merge'
@@ -98,4 +99,62 @@ export function buildClaimCommand(
   // /claim area:(Ingol) Ingol -1 start:21 end:22 character:Very Pog
   const cmd = `/claim area:(${areaName}) ${spawnName} start:${start} end:${end} character:${character}`
   return cmd
+}
+
+function formatDateForCalendar(dateString: string): string {
+  // Parse the ISO string components
+  const parsed = parseISO(dateString)
+  const year = parsed.getFullYear()
+  const month = parsed.getMonth()
+  const date = parsed.getDate()
+  const hours = parsed.getHours()
+  const minutes = parsed.getMinutes()
+  const seconds = parsed.getSeconds()
+
+  // Create TZDate in Berlin timezone (since reservation dates are in Berlin time)
+  const berlinDate = new TZDate(
+    year,
+    month,
+    date,
+    hours,
+    minutes,
+    seconds,
+    0,
+    'Europe/Berlin',
+  )
+
+  // Convert to local timezone by creating a regular Date from the timestamp
+  const localDate = new Date(berlinDate.getTime())
+
+  // Format for Google Calendar (without timezone suffix means local time)
+  return format(localDate, "yyyyMMdd'T'HHmmss")
+}
+
+function makeCalendarEvent(
+  title: string,
+  startDate: string,
+  endDate: string,
+): CalendarEvent {
+  return {
+    title: `Claim ${title}`,
+    start: formatDateForCalendar(startDate),
+    end: formatDateForCalendar(endDate),
+  }
+}
+
+export function getCalendarUrl(
+  calendar: 'google' | 'outlook' | 'office',
+  title: string,
+  startDate: string,
+  endDate: string,
+) {
+  const evt = makeCalendarEvent(title, startDate, endDate)
+  switch (calendar) {
+    case 'google':
+      return google(evt)
+    case 'outlook':
+      return outlook(evt)
+    case 'office':
+      return office365(evt)
+  }
 }

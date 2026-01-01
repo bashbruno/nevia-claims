@@ -175,7 +175,7 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
           </p>
         )}
         {spawnReservations?.reservations.map((r) => (
-          <ReservationDisplay key={r.id} reservation={r} />
+          <ReservationDisplay key={r.id} reservation={r} spawnName={spawn} />
         ))}
       </Accordion.Content>
     </Accordion.Container>

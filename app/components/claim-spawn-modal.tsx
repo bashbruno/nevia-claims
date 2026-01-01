@@ -3,10 +3,11 @@ import { Check, Copy } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { ClaimTimeInput } from '~/components/claim-time-input'
 import { useAreas } from '~/hooks/use-areas'
+import { useModalEscapeKey } from '~/hooks/use-modal-escape-key'
 import { useAppStoreActions, useCharacterName } from '~/lib/state'
 import { buildClaimCommand, cn, copyToClipboard } from '~/utils'
 
-const CLAIM_SPAWN_MODAL_ID = 'spawn-actions-modal'
+const CLAIM_SPAWN_MODAL_ID = 'claim-spawn-modal'
 
 type Props = {
   spawnName: string
@@ -19,6 +20,8 @@ export const ClaimSpawnModal = NiceModal.create(
     const areas = useAreas()
 
     const targetArea = areas.find((a) => a.id === areaId)
+
+    useModalEscapeKey(modal)
 
     async function handleCopyClaim(
       start: string | undefined,
