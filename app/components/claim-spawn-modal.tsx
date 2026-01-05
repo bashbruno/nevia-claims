@@ -1,13 +1,11 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Check, Copy } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { AppModal } from '~/components/app-modal'
 import { ClaimTimeInput } from '~/components/claim-time-input'
 import { useAreas } from '~/hooks/use-areas'
-import { useModalEscapeKey } from '~/hooks/use-modal-escape-key'
 import { useAppStoreActions, useCharacterName } from '~/lib/state'
-import { buildClaimCommand, cn, copyToClipboard } from '~/utils'
-
-const CLAIM_SPAWN_MODAL_ID = 'claim-spawn-modal'
+import { buildClaimCommand, copyToClipboard } from '~/utils'
 
 type Props = {
   spawnName: string
@@ -20,8 +18,6 @@ export const ClaimSpawnModal = NiceModal.create(
     const areas = useAreas()
 
     const targetArea = areas.find((a) => a.id === areaId)
-
-    useModalEscapeKey(modal)
 
     async function handleCopyClaim(
       start: string | undefined,
@@ -41,13 +37,13 @@ export const ClaimSpawnModal = NiceModal.create(
     }
 
     return (
-      <dialog
-        id={CLAIM_SPAWN_MODAL_ID}
-        className={cn('modal modal-bottom sm:modal-middle', {
-          'modal-open': modal.visible,
-        })}
+      <AppModal.Container
+        open={modal.visible}
+        onOpenChange={(open) => {
+          if (!open) modal.remove()
+        }}
       >
-        <div className="modal-box border border-white/5">
+        <AppModal.Content>
           {!targetArea ? (
             <ErrorState />
           ) : (
@@ -57,13 +53,8 @@ export const ClaimSpawnModal = NiceModal.create(
               spawnName={spawnName}
             />
           )}
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button type="submit" onClick={modal.remove}>
-            Close
-          </button>
-        </form>
-      </dialog>
+        </AppModal.Content>
+      </AppModal.Container>
     )
   },
 )
@@ -137,7 +128,11 @@ function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
 
   return (
     <form onSubmit={handleConfirm} className="space-y-5">
-      <h3 className="font-bold text-lg">Claim Spawn</h3>
+      <AppModal.Header>
+        <AppModal.Title>
+          <h3 className="font-bold text-lg">Claim Spawn</h3>
+        </AppModal.Title>
+      </AppModal.Header>
       <ClaimTimeInput
         placeholder="Start"
         name="start"
@@ -164,10 +159,12 @@ function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
         value={characterName}
         onChange={(e) => setCharacterName(e.target.value)}
       />
+
       <div className="rounded-lg bg-base-300 p-3">
         <code className="text-sm break-all">{commandPreview}</code>
       </div>
-      <div className="flex justify-end">
+
+      <AppModal.Footer>
         <button type="submit" className="btn btn-neutral">
           {!copied && (
             <span className="flex items-center gap-2">
@@ -182,11 +179,17 @@ function ClaimForm({ onConfirm, areaName, spawnName }: ClaimFormProps) {
             </span>
           )}
         </button>
-      </div>
+      </AppModal.Footer>
     </form>
   )
 }
 
 function ErrorState() {
-  return <h3 className="font-bold text-lg">Failed to determine target area.</h3>
+  return (
+    <AppModal.Header>
+      <AppModal.Title>
+        <h3 className="font-bold text-lg">Failed to determine target area.</h3>
+      </AppModal.Title>
+    </AppModal.Header>
+  )
 }

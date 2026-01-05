@@ -2,7 +2,7 @@ import NiceModal from '@ebay/nice-modal-react'
 import { Hand, Star } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { Virtuoso } from 'react-virtuoso'
-import { Accordion } from '~/components/accordion'
+// import { Accordion } from '~/components/accordion'
 import { ClaimSpawnModal } from '~/components/claim-spawn-modal'
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import { ReservationDisplay } from '~/components/reservation-display'
@@ -95,23 +95,25 @@ function AreaAccordion({ area, filteredSpawns }: AreaAccordionProps) {
   const selectedAreas = useSelectedAreas()
   const hasActiveSearch = !!search.trim() || selectedAreas.size > 0
 
-  return (
-    <Accordion.Container
-      name={`accordion-area-${area.id}`}
-      forceOpen={hasActiveSearch}
-    >
-      <Accordion.Title>
-        <span className="hover:underline underline-offset-2 text-sm md:text-base">
-          {area.name}
-        </span>
-      </Accordion.Title>
-      <Accordion.Content className="space-y-3">
-        {filteredSpawns.map((spawn) => (
-          <SpawnAccordion key={spawn} spawn={spawn} areaId={area.id} />
-        ))}
-      </Accordion.Content>
-    </Accordion.Container>
-  )
+  return null
+
+  // return (
+  //   <Accordion.Container
+  //     name={`accordion-area-${area.id}`}
+  //     forceOpen={hasActiveSearch}
+  //   >
+  //     <Accordion.Title>
+  //       <span className="hover:underline underline-offset-2 text-sm md:text-base">
+  //         {area.name}
+  //       </span>
+  //     </Accordion.Title>
+  //     <Accordion.Content className="space-y-3">
+  //       {filteredSpawns.map((spawn) => (
+  //         <SpawnAccordion key={spawn} spawn={spawn} areaId={area.id} />
+  //       ))}
+  //     </Accordion.Content>
+  //   </Accordion.Container>
+  // )
 }
 
 type SpawnAccordionProps = {
@@ -133,51 +135,53 @@ function SpawnAccordion({ spawn, areaId }: SpawnAccordionProps) {
   const isEmpty = !spawnReservations?.reservations.length
   const hasActiveSearch = !!search.trim() || selectedAreas.size > 0
 
-  return (
-    <Accordion.Container
-      name={`accordion-respawn-${spawn}`}
-      forceOpen={hasActiveSearch}
-    >
-      <Accordion.Title className="flex gap-2 items-center">
-        <button
-          type="button"
-          className="btn btn-square bg-transparent border-none hover:bg-neutral"
-          onClick={(e) => {
-            e.stopPropagation()
-            toggleFavoritedSpawn(spawn)
-          }}
-        >
-          <Star
-            size={18}
-            fill={favoritedSpawns.has(spawn) ? 'yellow' : 'transparent'}
-          />
-        </button>
+  return null
 
-        <button
-          type="button"
-          className="btn btn-square bg-transparent border-none hover:bg-neutral"
-          onClick={(e) => {
-            e.stopPropagation()
-            NiceModal.show(ClaimSpawnModal, { spawnName: spawn, areaId })
-          }}
-        >
-          <Hand size={18} />
-        </button>
-
-        <span className="hover:underline underline-offset-2">
-          <HighlitableBySearch text={spawn} />
-        </span>
-      </Accordion.Title>
-      <Accordion.Content className="space-y-3">
-        {isEmpty && (
-          <p className="text-center text-xs md:text-sm">
-            This spawn has no claims. It's completely free!
-          </p>
-        )}
-        {spawnReservations?.reservations.map((r) => (
-          <ReservationDisplay key={r.id} reservation={r} spawnName={spawn} />
-        ))}
-      </Accordion.Content>
-    </Accordion.Container>
-  )
+  // return (
+  //   <Accordion.Container
+  //     name={`accordion-respawn-${spawn}`}
+  //     forceOpen={hasActiveSearch}
+  //   >
+  //     <Accordion.Title className="flex gap-2 items-center">
+  //       <button
+  //         type="button"
+  //         className="btn btn-square bg-transparent border-none hover:bg-neutral"
+  //         onClick={(e) => {
+  //           e.stopPropagation()
+  //           toggleFavoritedSpawn(spawn)
+  //         }}
+  //       >
+  //         <Star
+  //           size={18}
+  //           fill={favoritedSpawns.has(spawn) ? 'yellow' : 'transparent'}
+  //         />
+  //       </button>
+  //
+  //       <button
+  //         type="button"
+  //         className="btn btn-square bg-transparent border-none hover:bg-neutral"
+  //         onClick={(e) => {
+  //           e.stopPropagation()
+  //           NiceModal.show(ClaimSpawnModal, { spawnName: spawn, areaId })
+  //         }}
+  //       >
+  //         <Hand size={18} />
+  //       </button>
+  //
+  //       <span className="hover:underline underline-offset-2">
+  //         <HighlitableBySearch text={spawn} />
+  //       </span>
+  //     </Accordion.Title>
+  //     <Accordion.Content className="space-y-3">
+  //       {isEmpty && (
+  //         <p className="text-center text-xs md:text-sm">
+  //           This spawn has no claims. It's completely free!
+  //         </p>
+  //       )}
+  //       {spawnReservations?.reservations.map((r) => (
+  //         <ReservationDisplay key={r.id} reservation={r} spawnName={spawn} />
+  //       ))}
+  //     </Accordion.Content>
+  //   </Accordion.Container>
+  // )
 }

@@ -1,16 +1,11 @@
-import type { ComponentProps, PropsWithChildren } from 'react'
+import { Checkbox, type CheckboxProps } from '~/components/ui/checkbox'
+import { Label } from '~/components/ui/label'
 
-type Props = PropsWithChildren<ComponentProps<'input'>>
-
-export function AreaCheckbox({ children, ...props }: Props) {
+export function AreaCheckbox({ children, ...props }: CheckboxProps) {
   return (
-    <label className="label text-sm p-2 rounded-md hover:bg-white/10 text-white">
-      <input
-        type="checkbox"
-        className="checkbox checkbox-xs rounded-md checkbox-secondary"
-        {...props}
-      />
+    <Label>
+      <Checkbox {...props} />
       {children}
-    </label>
+    </Label>
   )
 }
