@@ -2,6 +2,7 @@ import NiceModal from '@ebay/nice-modal-react'
 import { Ellipsis } from 'lucide-react'
 import { HighlitableBySearch } from '~/components/highlitable-by-search'
 import type { Reservation } from '~/lib/api/types'
+import { useIsMarkedAsMine } from '~/lib/state'
 import { cn, formatDate, formatTime, getIsAdvanceClaim } from '~/utils'
 import { ReservationActionsModal } from './reservation-actions-modal'
 
@@ -12,6 +13,7 @@ type Props = {
 
 export function ReservationDisplay({ reservation, spawnName }: Props) {
   const isAdvanceClaim = getIsAdvanceClaim(reservation.startDate)
+  const isMarkedAsMine = useIsMarkedAsMine(reservation.id)
   const startTime = formatTime(reservation.startDate)
   const endTime = formatTime(reservation.endDate)
   const startDate = formatDate(reservation.startDate)
@@ -22,6 +24,7 @@ export function ReservationDisplay({ reservation, spawnName }: Props) {
         'bg-neutral p-2 rounded-md flex flex-col gap-2 md:items-center md:justify-between md:flex-row',
         {
           'bg-purple-900/80 border border-purple-700': isAdvanceClaim,
+          'bg-green-900/80 border border-green-700': isMarkedAsMine,
         },
       )}
     >

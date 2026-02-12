@@ -1,3 +1,5 @@
+import { TZDate } from '@date-fns/tz'
+import { parseISO } from 'date-fns'
 import { enableMapSet } from 'immer'
 import { create } from 'zustand'
 import {
@@ -22,6 +24,7 @@ type State = {
   openAccordions: Set<string>
   hasHydrated: boolean
   characterName: string
+  markedAsMySpawns: Map<number, string> // reservationId -> endDate
 }
 
 type Actions = {
@@ -32,6 +35,8 @@ type Actions = {
   toggleShowOnlyFavorited: () => void
   toggleAccordion: (accordionName: string) => void
   setCharacterName: (name: string) => void
+  toggleMarkedAsMine: (reservationId: number, endDate: string) => void
+  cleanupExpiredMarkedSpawns: () => void
 }
 
 export function useSelectedAreas() {
@@ -67,6 +72,14 @@ export function useHasHydrated() {
   return useAppStore((s) => s.state.hasHydrated)
 }
 
+export function useIsMarkedAsMine(reservationId: number) {
+  return useAppStore((s) => s.state.markedAsMySpawns.has(reservationId))
+}
+
+export function useMarkedAsMySpawns() {
+  return useAppStore((s) => s.state.markedAsMySpawns)
+}
+
 const useAppStore = create<AppStore>()(
   persist(
     immer((set) => ({
@@ -78,6 +91,7 @@ const useAppStore = create<AppStore>()(
         openAccordions: new Set(),
         hasHydrated: false,
         characterName: '',
+        markedAsMySpawns: new Map(),
       },
       actions: {
         toggleSelectedArea: (areaId) => {
@@ -127,6 +141,45 @@ const useAppStore = create<AppStore>()(
             s.state.characterName = name
           })
         },
+        toggleMarkedAsMine: (reservationId, endDate) => {
+          set((s) => {
+            if (s.state.markedAsMySpawns.has(reservationId)) {
+              s.state.markedAsMySpawns.delete(reservationId)
+            } else {
+              s.state.markedAsMySpawns.set(reservationId, endDate)
+            }
+          })
+        },
+        cleanupExpiredMarkedSpawns: () => {
+          set((s) => {
+            const nowCET = new TZDate(new Date(), 'Europe/Berlin')
+            const toDelete: number[] = []
+
+            s.state.markedAsMySpawns.forEach((endDate, reservationId) => {
+              // Parse endDate as ISO string and treat it as Berlin time
+              const parsed = parseISO(endDate)
+              const endDateCET = new TZDate(
+                parsed.getFullYear(),
+                parsed.getMonth(),
+                parsed.getDate(),
+                parsed.getHours(),
+                parsed.getMinutes(),
+                parsed.getSeconds(),
+                0,
+                'Europe/Berlin',
+              )
+
+              // If endDate has passed, mark for deletion
+              if (endDateCET.getTime() < nowCET.getTime()) {
+                toDelete.push(reservationId)
+              }
+            })
+
+            toDelete.forEach((id) => {
+              s.state.markedAsMySpawns.delete(id)
+            })
+          })
+        },
       },
     })),
     {
@@ -160,6 +213,9 @@ function makeStorage(): PersistStorage<AppStore> {
             ),
             favoritedSpawns: new Set(existingValue.state.state.favoritedSpawns),
             openAccordions: new Set(existingValue.state.state.openAccordions),
+            markedAsMySpawns: new Map(
+              existingValue.state.state.markedAsMySpawns,
+            ),
           },
         },
       }
@@ -173,6 +229,9 @@ function makeStorage(): PersistStorage<AppStore> {
             selectedAreasIds: Array.from(newValue.state.state.selectedAreasIds),
             favoritedSpawns: Array.from(newValue.state.state.favoritedSpawns),
             openAccordions: Array.from(newValue.state.state.openAccordions),
+            markedAsMySpawns: Array.from(
+              newValue.state.state.markedAsMySpawns.entries(),
+            ),
           },
           // actions are not persisted
         },
