@@ -4,13 +4,19 @@ import {
   useAppStoreActions,
   useFilterSearch,
   useShowOnlyFavorited,
+  useShowOnlyMine,
 } from '~/lib/state'
 
 export function Header() {
   const search = useFilterSearch()
   const showOnlyFavorited = useShowOnlyFavorited()
-  const { setFilterSearch, toggleShowOnlyFavorited, clearSelectedAreas } =
-    useAppStoreActions()
+  const showOnlyMine = useShowOnlyMine()
+  const {
+    setFilterSearch,
+    toggleShowOnlyFavorited,
+    toggleShowOnlyMine,
+    clearSelectedAreas,
+  } = useAppStoreActions()
 
   const handleSearchChange = (value: string) => {
     setFilterSearch(value)
@@ -18,6 +24,9 @@ export function Header() {
       clearSelectedAreas()
       if (showOnlyFavorited) {
         toggleShowOnlyFavorited()
+      }
+      if (showOnlyMine) {
+        toggleShowOnlyMine()
       }
     }
   }
@@ -27,7 +36,21 @@ export function Header() {
       setFilterSearch('')
     }
     clearSelectedAreas()
+    if (showOnlyMine) {
+      toggleShowOnlyMine()
+    }
     toggleShowOnlyFavorited()
+  }
+
+  const handleToggleMine = () => {
+    if (search.trim()) {
+      setFilterSearch('')
+    }
+    clearSelectedAreas()
+    if (showOnlyFavorited) {
+      toggleShowOnlyFavorited()
+    }
+    toggleShowOnlyMine()
   }
 
   return (
@@ -42,17 +65,30 @@ export function Header() {
         value={search}
         onChange={(e) => handleSearchChange(e.target.value)}
       />
-      <label className="inline-flex items-center gap-2 cursor-pointer">
-        <input
-          type="checkbox"
-          className="toggle toggle-primary"
-          checked={showOnlyFavorited}
-          onChange={handleToggleFavorites}
-        />
-        <span className="label-text hover:underline underline-offset-2 text-sm md:text-base">
-          Show favorites
-        </span>
-      </label>
+      <div className="flex flex-col gap-4 md:flex-row">
+        <label className="inline-flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={showOnlyFavorited}
+            onChange={handleToggleFavorites}
+          />
+          <span className="label-text hover:underline underline-offset-2 text-sm md:text-base">
+            Show favorites
+          </span>
+        </label>
+        <label className="inline-flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={showOnlyMine}
+            onChange={handleToggleMine}
+          />
+          <span className="label-text hover:underline underline-offset-2 text-sm md:text-base">
+            Show only mine
+          </span>
+        </label>
+      </div>
     </header>
   )
 }

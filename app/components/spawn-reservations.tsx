@@ -13,8 +13,10 @@ import {
   useAppStoreActions,
   useFavoritedSpawns,
   useFilterSearch,
+  useMarkedAsMySpawns,
   useSelectedAreas,
   useShowOnlyFavorited,
+  useShowOnlyMine,
 } from '~/lib/state'
 import { hasMatchingPlayerInSpawn, matchesSearchTerm } from '~/utils/filtering'
 
@@ -23,7 +25,9 @@ export function SpawnReservations() {
   const search = useFilterSearch()
   const selectedAreas = useSelectedAreas()
   const showOnlyFavorited = useShowOnlyFavorited()
+  const showOnlyMine = useShowOnlyMine()
   const favoritedSpawns = useFavoritedSpawns()
+  const markedAsMySpawns = useMarkedAsMySpawns()
   const reservations = useReservations()
 
   const getFilteredSpawns = useCallback(
@@ -32,6 +36,21 @@ export function SpawnReservations() {
 
       if (showOnlyFavorited) {
         spawns = spawns.filter((spawn) => favoritedSpawns.has(spawn))
+      }
+
+      if (showOnlyMine) {
+        // Filter spawns that have at least one reservation marked as mine
+        spawns = spawns.filter((spawn) => {
+          const areaReservations = reservations.data?.find(
+            (r) => r.id === area.id,
+          )
+          const spawnReservations = areaReservations?.respawnReservations.find(
+            (r) => r.name === spawn,
+          )
+          return spawnReservations?.reservations.some((res) =>
+            markedAsMySpawns.has(res.id),
+          )
+        })
       }
 
       if (search.trim()) {
@@ -45,7 +64,14 @@ export function SpawnReservations() {
 
       return spawns
     },
-    [favoritedSpawns, showOnlyFavorited, search, reservations.data],
+    [
+      favoritedSpawns,
+      showOnlyFavorited,
+      showOnlyMine,
+      markedAsMySpawns,
+      search,
+      reservations.data,
+    ],
   )
 
   const filtered = useMemo(() => {

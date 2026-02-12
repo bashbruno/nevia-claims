@@ -21,6 +21,7 @@ type State = {
   filterSearch: string
   favoritedSpawns: Set<string>
   showOnlyFavorited: boolean
+  showOnlyMine: boolean
   openAccordions: Set<string>
   hasHydrated: boolean
   characterName: string
@@ -33,6 +34,7 @@ type Actions = {
   setFilterSearch: (val: string) => void
   toggleFavoritedSpawn: (spawnName: string) => void
   toggleShowOnlyFavorited: () => void
+  toggleShowOnlyMine: () => void
   toggleAccordion: (accordionName: string) => void
   setCharacterName: (name: string) => void
   toggleMarkedAsMine: (
@@ -64,6 +66,10 @@ export function useShowOnlyFavorited() {
   return useAppStore((s) => s.state.showOnlyFavorited)
 }
 
+export function useShowOnlyMine() {
+  return useAppStore((s) => s.state.showOnlyMine)
+}
+
 export function useIsAccordionOpen(accordionName: string) {
   const accordions = useAppStore((s) => s.state.openAccordions)
   return accordions.has(accordionName)
@@ -93,6 +99,7 @@ const useAppStore = create<AppStore>()(
         filterSearch: '',
         favoritedSpawns: new Set(),
         showOnlyFavorited: false,
+        showOnlyMine: false,
         openAccordions: new Set(),
         hasHydrated: false,
         characterName: '',
@@ -130,6 +137,11 @@ const useAppStore = create<AppStore>()(
         toggleShowOnlyFavorited: () => {
           set((s) => {
             s.state.showOnlyFavorited = !s.state.showOnlyFavorited
+          })
+        },
+        toggleShowOnlyMine: () => {
+          set((s) => {
+            s.state.showOnlyMine = !s.state.showOnlyMine
           })
         },
         toggleAccordion: (accordionName) => {
