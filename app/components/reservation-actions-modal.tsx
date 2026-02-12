@@ -1,6 +1,8 @@
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { CalendarClock, Star } from 'lucide-react'
+import { useMemo } from 'react'
 import { useModalEscapeKey } from '~/hooks/use-modal-escape-key'
+import { useReservations } from '~/lib/api/react-query'
 import type { Reservation } from '~/lib/api/types'
 import { useAppStoreActions, useIsMarkedAsMine } from '~/lib/state'
 import { cn, getCalendarUrl } from '~/utils'
@@ -19,6 +21,7 @@ export const ReservationActionsModal = NiceModal.create(
     const modal = useModal()
     const { toggleMarkedAsMine } = useAppStoreActions()
     const isMarkedAsMine = useIsMarkedAsMine(reservation.id)
+    const reservations = useReservations()
 
     useModalEscapeKey(modal)
 
@@ -26,8 +29,32 @@ export const ReservationActionsModal = NiceModal.create(
     const outlookCalendarUrl = getCalendarUrl('outlook', spawnName, reservation)
     const officeCalendarUrl = getCalendarUrl('office', spawnName, reservation)
 
+    // Find all reservations with the same character name
+    const allReservationsWithSameChar = useMemo(() => {
+      if (!reservations.data) return []
+
+      const result: Array<{ id: number; endDate: string }> = []
+
+      reservations.data.forEach((area) => {
+        area.respawnReservations.forEach((spawn) => {
+          spawn.reservations.forEach((res) => {
+            if (res.characterName === reservation.characterName) {
+              result.push({ id: res.id, endDate: res.endDate })
+            }
+          })
+        })
+      })
+
+      return result
+    }, [reservations.data, reservation.characterName])
+
     const handleToggleMarkedAsMine = () => {
-      toggleMarkedAsMine(reservation.id, reservation.endDate)
+      toggleMarkedAsMine(
+        reservation.id,
+        reservation.endDate,
+        reservation.characterName,
+        allReservationsWithSameChar,
+      )
     }
 
     return (

@@ -35,7 +35,12 @@ type Actions = {
   toggleShowOnlyFavorited: () => void
   toggleAccordion: (accordionName: string) => void
   setCharacterName: (name: string) => void
-  toggleMarkedAsMine: (reservationId: number, endDate: string) => void
+  toggleMarkedAsMine: (
+    reservationId: number,
+    endDate: string,
+    characterName: string,
+    allReservationsWithSameChar?: Array<{ id: number; endDate: string }>,
+  ) => void
   cleanupExpiredMarkedSpawns: () => void
 }
 
@@ -141,12 +146,28 @@ const useAppStore = create<AppStore>()(
             s.state.characterName = name
           })
         },
-        toggleMarkedAsMine: (reservationId, endDate) => {
+        toggleMarkedAsMine: (
+          reservationId,
+          endDate,
+          characterName,
+          allReservationsWithSameChar,
+        ) => {
           set((s) => {
             if (s.state.markedAsMySpawns.has(reservationId)) {
+              // Unmark this reservation
               s.state.markedAsMySpawns.delete(reservationId)
             } else {
+              // Mark this reservation
               s.state.markedAsMySpawns.set(reservationId, endDate)
+
+              // Also mark all other reservations with the same character name
+              if (allReservationsWithSameChar) {
+                allReservationsWithSameChar.forEach((res) => {
+                  if (res.id !== reservationId) {
+                    s.state.markedAsMySpawns.set(res.id, res.endDate)
+                  }
+                })
+              }
             }
           })
         },
