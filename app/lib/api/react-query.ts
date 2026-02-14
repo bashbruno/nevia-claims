@@ -10,6 +10,7 @@ export const reservationsQueryOpts = queryOptions({
   queryKey: appQueryKeys.reservations,
   queryFn: getApiReservations,
   refetchInterval: time.second * 5,
+  refetchOnWindowFocus: 'always',
 })
 
 export function useReservations() {
