@@ -1,5 +1,7 @@
+import { RefreshCw } from 'lucide-react'
 import { MobileSidebar } from '~/components/mobile-sidebar'
 import { SearchInput } from '~/components/search-input'
+import { useReservations } from '~/lib/api/react-query'
 import {
   useAppStoreActions,
   useFilterSearch,
@@ -17,6 +19,7 @@ export function Header() {
     toggleShowOnlyMine,
     clearSelectedAreas,
   } = useAppStoreActions()
+  const { refetch, isFetching } = useReservations()
 
   const handleSearchChange = (value: string) => {
     setFilterSearch(value)
@@ -65,7 +68,7 @@ export function Header() {
         value={search}
         onChange={(e) => handleSearchChange(e.target.value)}
       />
-      <div className="flex flex-col gap-4 md:flex-row">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center">
         <label className="inline-flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
@@ -88,6 +91,17 @@ export function Header() {
             Show only mine
           </span>
         </label>
+        <button
+          type="button"
+          className="btn btn-primary btn-sm gap-2 w-full md:w-auto md:ml-auto"
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw
+            className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`}
+          />
+          <span className="text-sm md:text-base">Refresh Data</span>
+        </button>
       </div>
     </header>
   )
