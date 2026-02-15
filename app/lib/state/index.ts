@@ -25,7 +25,7 @@ type State = {
   openAccordions: Set<string>
   hasHydrated: boolean
   characterName: string
-  markedAsMySpawns: Map<number, string> // reservationId -> endDate
+  markedAsMySpawns: Map<string, string> // characterName -> endDate
 }
 
 type Actions = {
@@ -38,10 +38,8 @@ type Actions = {
   toggleAccordion: (accordionName: string) => void
   setCharacterName: (name: string) => void
   toggleMarkedAsMine: (
-    reservationId: number,
-    endDate: string,
     characterName: string,
-    allReservationsWithSameChar?: Array<{ id: number; endDate: string }>,
+    allReservationsWithSameChar: Array<{ id: number; endDate: string }>,
   ) => void
   cleanupExpiredMarkedSpawns: () => void
 }
@@ -83,8 +81,8 @@ export function useHasHydrated() {
   return useAppStore((s) => s.state.hasHydrated)
 }
 
-export function useIsMarkedAsMine(reservationId: number) {
-  return useAppStore((s) => s.state.markedAsMySpawns.has(reservationId))
+export function useIsMarkedAsMine(characterName: string) {
+  return useAppStore((s) => s.state.markedAsMySpawns.has(characterName))
 }
 
 export function useMarkedAsMySpawns() {
@@ -158,37 +156,58 @@ const useAppStore = create<AppStore>()(
             s.state.characterName = name
           })
         },
-        toggleMarkedAsMine: (
-          reservationId,
-          endDate,
-          characterName,
-          allReservationsWithSameChar,
-        ) => {
+        toggleMarkedAsMine: (characterName, allReservationsWithSameChar) => {
           set((s) => {
-            if (s.state.markedAsMySpawns.has(reservationId)) {
-              // Unmark this reservation
-              s.state.markedAsMySpawns.delete(reservationId)
+            if (s.state.markedAsMySpawns.has(characterName)) {
+              // Unmark this character
+              s.state.markedAsMySpawns.delete(characterName)
             } else {
-              // Mark this reservation
-              s.state.markedAsMySpawns.set(reservationId, endDate)
+              // Find the latest endDate among all reservations for this character
+              // Important: endDates from API are in Berlin timezone
+              const latestEndDate = allReservationsWithSameChar.reduce(
+                (latest, res) => {
+                  // Parse both dates as Berlin timezone to compare properly
+                  const parsedLatest = parseISO(latest)
+                  const latestCET = new TZDate(
+                    parsedLatest.getFullYear(),
+                    parsedLatest.getMonth(),
+                    parsedLatest.getDate(),
+                    parsedLatest.getHours(),
+                    parsedLatest.getMinutes(),
+                    parsedLatest.getSeconds(),
+                    0,
+                    'Europe/Berlin',
+                  )
 
-              // Also mark all other reservations with the same character name
-              if (allReservationsWithSameChar) {
-                allReservationsWithSameChar.forEach((res) => {
-                  if (res.id !== reservationId) {
-                    s.state.markedAsMySpawns.set(res.id, res.endDate)
-                  }
-                })
-              }
+                  const parsedRes = parseISO(res.endDate)
+                  const resCET = new TZDate(
+                    parsedRes.getFullYear(),
+                    parsedRes.getMonth(),
+                    parsedRes.getDate(),
+                    parsedRes.getHours(),
+                    parsedRes.getMinutes(),
+                    parsedRes.getSeconds(),
+                    0,
+                    'Europe/Berlin',
+                  )
+
+                  return resCET.getTime() > latestCET.getTime()
+                    ? res.endDate
+                    : latest
+                },
+                allReservationsWithSameChar[0].endDate,
+              )
+
+              s.state.markedAsMySpawns.set(characterName, latestEndDate)
             }
           })
         },
         cleanupExpiredMarkedSpawns: () => {
           set((s) => {
             const nowCET = new TZDate(new Date(), 'Europe/Berlin')
-            const toDelete: number[] = []
+            const toDelete: string[] = []
 
-            s.state.markedAsMySpawns.forEach((endDate, reservationId) => {
+            s.state.markedAsMySpawns.forEach((endDate, characterName) => {
               // Parse endDate as ISO string and treat it as Berlin time
               const parsed = parseISO(endDate)
               const endDateCET = new TZDate(
@@ -204,12 +223,12 @@ const useAppStore = create<AppStore>()(
 
               // If endDate has passed, mark for deletion
               if (endDateCET.getTime() < nowCET.getTime()) {
-                toDelete.push(reservationId)
+                toDelete.push(characterName)
               }
             })
 
-            toDelete.forEach((id) => {
-              s.state.markedAsMySpawns.delete(id)
+            toDelete.forEach((name) => {
+              s.state.markedAsMySpawns.delete(name)
             })
           })
         },

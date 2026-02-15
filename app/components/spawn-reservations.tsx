@@ -48,7 +48,7 @@ export function SpawnReservations() {
             (r) => r.name === spawn,
           )
           return spawnReservations?.reservations.some((res) =>
-            markedAsMySpawns.has(res.id),
+            markedAsMySpawns.has(res.characterName),
           )
         })
       }

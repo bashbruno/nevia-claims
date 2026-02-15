@@ -20,7 +20,7 @@ export const ReservationActionsModal = NiceModal.create(
   ({ spawnName, reservation }: Props) => {
     const modal = useModal()
     const { toggleMarkedAsMine } = useAppStoreActions()
-    const isMarkedAsMine = useIsMarkedAsMine(reservation.id)
+    const isMarkedAsMine = useIsMarkedAsMine(reservation.characterName)
     const reservations = useReservations()
 
     useModalEscapeKey(modal)
@@ -49,12 +49,7 @@ export const ReservationActionsModal = NiceModal.create(
     }, [reservations.data, reservation.characterName])
 
     const handleToggleMarkedAsMine = () => {
-      toggleMarkedAsMine(
-        reservation.id,
-        reservation.endDate,
-        reservation.characterName,
-        allReservationsWithSameChar,
-      )
+      toggleMarkedAsMine(reservation.characterName, allReservationsWithSameChar)
     }
 
     return (

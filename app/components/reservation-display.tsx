@@ -13,7 +13,7 @@ type Props = {
 
 export function ReservationDisplay({ reservation, spawnName }: Props) {
   const isAdvanceClaim = getIsAdvanceClaim(reservation.startDate)
-  const isMarkedAsMine = useIsMarkedAsMine(reservation.id)
+  const isMarkedAsMine = useIsMarkedAsMine(reservation.characterName)
   const startTime = formatTime(reservation.startDate)
   const endTime = formatTime(reservation.endDate)
   const startDate = formatDate(reservation.startDate)
