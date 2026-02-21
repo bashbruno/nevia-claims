@@ -50,6 +50,7 @@ export const ReservationActionsModal = NiceModal.create(
 
     const handleToggleMarkedAsMine = () => {
       toggleMarkedAsMine(reservation.characterName, allReservationsWithSameChar)
+      modal.remove()
     }
 
     return (
