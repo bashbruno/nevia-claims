@@ -14,6 +14,7 @@ export function SearchInput({ label, className, ...props }: Props) {
           'input md:input-lg font-medium w-full lg:max-w-1/2',
           className,
         )}
+        onFocus={(e) => e.target.select()}
         {...props}
       />
       <span>{label}</span>
