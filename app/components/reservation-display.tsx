@@ -36,9 +36,15 @@ export function ReservationDisplay({ reservation, spawnName }: Props) {
       </div>
       <p className="font-semibold flex flex-col items-center text-sm md:text-base">
         {isAdvanceClaim && <span className="text-xs">(In Advance)</span>}
-        <span>
+        <a
+          href={`https://www.tibia.com/community/?subtopic=characters&${new URLSearchParams({ name: reservation.characterName })}`}
+          target="_blank"
+          rel="noreferrer"
+          className="hover:underline"
+          onClick={(e) => e.stopPropagation()}
+        >
           <HighlitableBySearch text={reservation.characterName} />
-        </span>
+        </a>
       </p>
       <div>
         <button
